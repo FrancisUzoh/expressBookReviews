@@ -3,7 +3,6 @@ let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
-const axios = require('axios');
 
 
 public_users.post("/register", (req, res) => {
@@ -84,86 +83,43 @@ public_users.get('/isbn/:isbn', function (req, res) {
     });
   
 // Get book details based on author
+public_users.get('/author/:author',function (req, res) {
+    //Write your code here
 
-public_users.get('/', async (req, res) => {
-    console.log("Before connect URL");
+    const authorLone = req.params.author.toLowerCase();
 
-    try {
-        const response = await axios.get('http://localhost:5000');
-        const books = response.data.books
+    const findAuthor = Object.values(books).filter((a) => {
 
+        return a.author.toLowerCase()===authorLone;
+    });
+    if (findAuthor.length > 0) {
         return res.status(200).json({
-            message: "All the list of books",
-            books: books
+            Message: `Author Name ${authorLone}`,
+            findAuthor: findAuthor
         });
-
-
-    } catch (error) {
-        console.error("error fetching data:", error.message);
-        return res.status(500).json({ error: error.message })
-
+    } else {
+        return res.status(404).json({ message: "Book not found" });
     }
-
-
-    let myPromise = new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (findAuthor.length > 0) {
-                resolve(findAuthor);
-            } else {
-                reject("Author name not found");
-            }
-        }, 6000);
-    });
-    console.log("Before calling promise");
-
-    myPromise.then((foundAuthor) => {
-        return res.status(200).json({
-            message: "Book found:",
-            author: foundAuthor
-        });
-    }).catch((err) => {
-        return res.status(404).json({
-            message: err
-        });
-    });
-
-    console.log("After calling promise");
 });
   
 
 // Get all books based on title
- public_users.get('/title/:title', function (req, res) {
-        const titleParam = req.params.title.toLowerCase();
+public_users.get('/title/:title', function (req, res) {
+    const titleParam = req.params.title.toLowerCase();
 
-        const booksByTitle = Object.values(books).filter((book) => {
-            return book.title.toLowerCase() === titleParam;
-        });
-
-
-        let myPromise = new Promise((resolve, reject) => {
-            setTimeout(() => {
-                if (booksByTitle.length > 0) {
-                    resolve(booksByTitle);
-                } else {
-                    reject("Book Title not found");
-                }
-            }, 6000);
-        });
-        console.log("Before calling promise");
-
-        myPromise.then((foundTitle) => {
-            return res.status(200).json({
-                message: "Book found:",
-                bookTitle: foundTitle
-            });
-        }).catch((err) => {
-            return res.status(404).json({
-                message: err
-            });
-        });
-
-        console.log("After calling promise");
+    const booksByTitle = Object.values(books).filter((book) => {
+        return book.title.toLowerCase() === titleParam;
     });
+
+    if (booksByTitle.length > 0) {
+        return res.status(200).json({
+            Message: `Books with title"${req.params.title}"`,
+            books: booksByTitle
+        });
+    } else {
+        return res.status(404).json({ message: "Book not found" });
+    }
+});
 
 
 //  Get book review

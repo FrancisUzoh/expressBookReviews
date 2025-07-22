@@ -1,0 +1,38 @@
+
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+
+const findUserIsbn = req.params.isbn;
+
+    const makeBookArray = Object.values(books)
+
+    let filter_isbn_users = makeBookArray.filter((i) => {
+
+        return i.ISBN === findUserIsbn
+    });
+
+    if (!req.session || !req.session.authorization) {
+
+        return res.status(401).json({ message: "Unauthorized. Please log in." });
+    }
+
+    const { username } = req.session.authorization;
+
+
+    if (filter_isbn_users.length === 0) {
+     return res.status(404).json({ message: "Book not found" });
+     }
+
+    let filter_isbn_user = filter_isbn_users[0];
+
+    if (!filter_isbn_user || !filter_isbn_user.reviews || !filter_isbn_user.reviews [username]){
+    return res.status (404).json({message:"No review found for this user"});
+    }
+
+    delete filter_isbn_user.reviews[username];
+
+
+   
+       return res.status(200).json({
+      message: "Please see deleted review below ",
+        reviews: filter_isbn_user.reviews });
+});

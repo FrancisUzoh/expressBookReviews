@@ -3,7 +3,6 @@ let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
-const axios = require('axios');
 
 
 public_users.post("/register", (req, res) => {
@@ -84,26 +83,15 @@ public_users.get('/isbn/:isbn', function (req, res) {
     });
   
 // Get book details based on author
+public_users.get('/author/:author', function (req, res) {
 
-public_users.get('/', async (req, res) => {
-    console.log("Before connect URL");
+    const authorLone = req.params.author.toLowerCase();
 
-    try {
-        const response = await axios.get('http://localhost:5000');
-        const books = response.data.books
+    const findAuthor = Object.values(books).filter((a) => {
 
-        return res.status(200).json({
-            message: "All the list of books",
-            books: books
-        });
+        return a.author.toLowerCase() === authorLone;
 
-
-    } catch (error) {
-        console.error("error fetching data:", error.message);
-        return res.status(500).json({ error: error.message })
-
-    }
-
+    });
 
     let myPromise = new Promise((resolve, reject) => {
         setTimeout(() => {
